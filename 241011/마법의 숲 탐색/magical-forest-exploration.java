@@ -4,7 +4,7 @@ import java.util.*;
 public class Main {
     static int R, C, K;
     static int[][] state;
-    static int[][] exit;
+    static Map<Integer, int[]> exit;
 
     static int answer;
 
@@ -19,7 +19,7 @@ public class Main {
         C = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
         state = new int[R + 1][C + 1]; // 1 ~ R, 1 ~ C
-        exit = new int[K + 1][2];
+        exit = new HashMap<>();
 
         for(int k = 1; k < K + 1; k++) {
             st = new StringTokenizer(br.readLine());
@@ -51,15 +51,14 @@ public class Main {
 
                         state[nr][nc] = k;
                         if(direction == d) { // 출구 좌표
-                            exit[k][0] = nr;
-                            exit[k][1] = nc;
+                            exit.put(k, new int[]{nr, nc});
                         }
                     }
                     state[r][c] = k;
 
                     if(!flag) { // 리셋
                         state = new int[R + 1][C + 1];
-                        exit = new int[K + 1][2];
+                        exit = new HashMap<>();
                         break;
                     }
 
@@ -102,15 +101,16 @@ public class Main {
                 
                 if(state[nr][nc] == k) { // 같은 골렘
                     queue.offer(new int[] {nr, nc, k});
-                    visited[r][c] = true;
+                    visited[nr][nc] = true;
                 } else if(state[nr][nc] > 0) { // 다른 골렘
                     // 현재 위치가 출구라면 다른 골렘으로 넘어갈 수 있음
-                    if(exit[k][0] != r || exit[k][1] != c) {
+                    int[] info = exit.get(k);
+                    if(info[0] != r || info[1] != c) {
                         continue;
                     }
 
                     queue.offer(new int[] {nr, nc, state[nr][nc]});
-                    visited[r][c] = true;
+                    visited[nr][nc] = true;
                 }
             }
         }
