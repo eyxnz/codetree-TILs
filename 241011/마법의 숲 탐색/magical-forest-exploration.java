@@ -33,11 +33,11 @@ public class Main {
                 } else if(goLeft(r, c)) { // 서
                     r++;
                     c--;
-                    d = d - 1 > 0 ? d - 1 : dir.length;
+                    d = d - 1 < 0 ? dir.length - 1 : d - 1;
                 } else if(goRight(r, c)) { // 동
                     r++;
                     c++;
-                    d = d + 1 < dir.length ? d + 1 : 0;
+                    d = d + 1 >= dir.length ? 0 : d + 1;
                 } else { // 움직일 수 없음
                     // 골렘의 몸 일부가 여전히 숲을 벗어난 상태인가?
                     boolean flag = true;
