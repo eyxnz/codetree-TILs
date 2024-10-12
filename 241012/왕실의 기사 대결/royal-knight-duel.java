@@ -79,18 +79,26 @@ public class Main {
                 if(!up(i)) {
                     continue;
                 }
+
+                moveUp(i);
             } else if(d == 1) { // 오른쪽
                 if(!right(i)) {
                     continue;
                 }
+
+                moveRight(i);
             } else if(d == 2) { // 아래쪽
                 if(!down(i)) {
                     continue;
                 }
+
+                moveDown(i);
             } else if(d == 3) { // 왼쪽
                 if(!left(i)) {
                     continue;
                 }
+
+                moveLeft(i);
             }
 
             // 피해 입은 기사 탐색
