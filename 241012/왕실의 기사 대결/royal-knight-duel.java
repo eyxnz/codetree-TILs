@@ -116,6 +116,7 @@ public class Main {
                     for(int h = 0; h < infos[n].h; h++) {
                         for(int w = 0; w < infos[n].w; w++) {
                             int r = infos[n].r + h, c = infos[n].c + w;
+
                             position[r][c] = 0;
                         }
                     }
@@ -142,42 +143,41 @@ public class Main {
         }
 
         // 윗 칸 탐색
-        boolean block = false; // 벽 존재 여부
         Set<Integer> another = new HashSet<>(); // 다른 기사 존재 여부
         for(int w = 0; w < infos[num].w; w++) {
             int r = infos[num].r - 1, c = infos[num].c + w;
 
-            if(arr[r][c] == 2) {
-                block = true;
-                break;
+            if(arr[r][c] == 2) { // 벽 존재
+                return false;
             }
 
-            if(position[r][c] != 0) {
+            if(position[r][c] != 0) { // 다른 기사 존재
                 another.add(position[r][c]);
             }
         }
 
-        // 윗 칸에 벽이 있는 경우
-        if(block) {
-            return false;
-        }
-
         // 윗 칸에 있는 다른 기사들을 이동시키지 못한 경우
-        for(Integer i : another) {
-            if(!up(i)) {
+        for(Integer n : another) {
+            if(!up(n)) {
                 return false;
             }
         }
 
         // 이동
+        for(Integer i : another) {
+            moveUp(i);
+        }
+
+        return true;
+    }
+
+    private static void moveUp(int num) {
         for(int w = 0; w < infos[num].w; w++) {
             position[infos[num].r + infos[num].h - 1][infos[num].c + w] = 0;
             position[infos[num].r - 1][infos[num].c + w] = num;
         }
         infos[num].r = infos[num].r - 1;
         target.add(num);
-
-        return true;
     }
 
     private static boolean right(int num) { // num번 기사를 오른쪽으로 밀 수 있는가?
@@ -215,14 +215,20 @@ public class Main {
         }
 
         // 이동
+        for(Integer i : another) {
+            moveRight(i);
+        }
+
+        return true;
+    }
+
+    private static void moveRight(int num) {
         for(int h = 0; h < infos[num].h; h++) {
             position[infos[num].r + h][infos[num].c] = 0;
             position[infos[num].r + h][infos[num].c + infos[num].w] = num;
         }
         infos[num].c = infos[num].c + 1;
         target.add(num);
-
-        return true;
     }
 
     private static boolean down(int num) { // num번 기사를 아래로 밀 수 있는가?
@@ -260,14 +266,20 @@ public class Main {
         }
 
         // 이동
+        for(Integer i : another) {
+            moveDown(i);
+        }
+
+        return true;
+    }
+
+    private static void moveDown(int num) {
         for(int w = 0; w < infos[num].w; w++) {
             position[infos[num].r][infos[num].c + w] = 0;
             position[infos[num].r + infos[num].h][infos[num].c + w] = num;
         }
         infos[num].r = infos[num].r + 1;
         target.add(num);
-
-        return true;
     }
 
     private static boolean left(int num) { // num번 기사를 왼쪽으로 밀 수 있는가?
@@ -305,13 +317,19 @@ public class Main {
         }
 
         // 이동
+        for(Integer i : another) {
+            moveLeft(i);
+        }
+
+        return true;
+    }
+
+    private static void moveLeft(int num) {
         for(int h = 0; h < infos[num].h; h++) {
             position[infos[num].r + h][infos[num].c + infos[num].w - 1] = 0;
             position[infos[num].r + h][infos[num].c - 1] = num;
         }
         infos[num].c = infos[num].c - 1;
         target.add(num);
-
-        return true;
     }
 }
