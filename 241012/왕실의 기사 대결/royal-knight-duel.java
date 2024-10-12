@@ -25,7 +25,7 @@ public class Main {
 
     static Info[] infos; // 기사 정보
     static int[][] position; // 현재 위치에 몇 번 기사가 있는지
-    static Set<Integer> target; // 밀린 기사 정보
+    static PriorityQueue<int[]> target; // 밀린 기사 정보
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -73,38 +73,45 @@ public class Main {
                 continue;
             }
 
-            target = new HashSet<>();
+            target = new PriorityQueue<>((o1, o2) -> {
+                return o2[0] - o1[0]; // depth가 깊은 순
+            });
 
             if(d == 0) { // 위쪽
-                if(!up(i)) {
+                if(!up(i, 0)) {
                     continue;
                 }
-
-                moveUp(i);
             } else if(d == 1) { // 오른쪽
-                if(!right(i)) {
+                if(!right(i, 0)) {
                     continue;
                 }
-
-                moveRight(i);
             } else if(d == 2) { // 아래쪽
-                if(!down(i)) {
+                if(!down(i, 0)) {
                     continue;
                 }
-
-                moveDown(i);
             } else if(d == 3) { // 왼쪽
-                if(!left(i)) {
+                if(!left(i, 0)) {
                     continue;
                 }
-
-                moveLeft(i);
             }
 
             // 피해 입은 기사 탐색
-            for(Integer n : target) {
-                if(n == i) {
+            while(!target.isEmpty()) {
+                int[] now = target.poll();
+                int n = now[1];
+
+                if(i == n) {
                     continue;
+                }
+
+                if(d == 0) { // 위쪽
+                    moveUp(n);
+                } else if(d == 1) { // 오른쪽
+                    moveRight(n);
+                } else if(d == 2) { // 아래쪽
+                    moveDown(n);
+                } else if(d == 3) { // 왼쪽
+                    moveLeft(n);
                 }
 
                 int cnt = 0; // 함정의 개수
@@ -144,7 +151,7 @@ public class Main {
         System.out.println(answer);
     }
 
-    private static boolean up(int num) { // num번 기사를 위로 밀 수 있는가?
+    private static boolean up(int num, int depth) { // num번 기사를 위로 밀 수 있는가?
         // 맨 윗 칸인 경우
         if(infos[num].r == 0) {
             return false;
@@ -166,15 +173,12 @@ public class Main {
 
         // 윗 칸에 있는 다른 기사들을 이동시키지 못한 경우
         for(Integer n : another) {
-            if(!up(n)) {
+            if(!up(n, depth + 1)) {
                 return false;
             }
         }
 
-        // 이동
-        for(Integer i : another) {
-            moveUp(i);
-        }
+        target.offer(new int[] {depth, num});
 
         return true;
     }
@@ -185,10 +189,9 @@ public class Main {
             position[infos[num].r - 1][infos[num].c + w] = num;
         }
         infos[num].r = infos[num].r - 1;
-        target.add(num);
     }
 
-    private static boolean right(int num) { // num번 기사를 오른쪽으로 밀 수 있는가?
+    private static boolean right(int num, int depth) { // num번 기사를 오른쪽으로 밀 수 있는가?
         // 맨 오른쪽 칸인 경우
         if(infos[num].c + infos[num].w == L) {
             return false;
@@ -217,15 +220,12 @@ public class Main {
 
         // 오른쪽 칸에 있는 다른 기사들을 이동시키지 못한 경우
         for(Integer i : another) {
-            if(!right(i)) {
+            if(!right(i, depth + 1)) {
                 return false;
             }
         }
 
-        // 이동
-        for(Integer i : another) {
-            moveRight(i);
-        }
+        target.offer(new int[] {depth, num});
 
         return true;
     }
@@ -236,10 +236,9 @@ public class Main {
             position[infos[num].r + h][infos[num].c + infos[num].w] = num;
         }
         infos[num].c = infos[num].c + 1;
-        target.add(num);
     }
 
-    private static boolean down(int num) { // num번 기사를 아래로 밀 수 있는가?
+    private static boolean down(int num, int depth) { // num번 기사를 아래로 밀 수 있는가?
         // 맨 아래 칸인 경우
         if(infos[num].r + infos[num].h == L) {
             return false;
@@ -268,15 +267,12 @@ public class Main {
 
         // 아래 칸에 있는 다른 기사들을 이동시키지 못한 경우
         for(Integer i : another) {
-            if(!down(i)) {
+            if(!down(i, depth + 1)) {
                 return false;
             }
         }
 
-        // 이동
-        for(Integer i : another) {
-            moveDown(i);
-        }
+        target.offer(new int[] {depth, num});
 
         return true;
     }
@@ -287,10 +283,9 @@ public class Main {
             position[infos[num].r + infos[num].h][infos[num].c + w] = num;
         }
         infos[num].r = infos[num].r + 1;
-        target.add(num);
     }
 
-    private static boolean left(int num) { // num번 기사를 왼쪽으로 밀 수 있는가?
+    private static boolean left(int num, int depth) { // num번 기사를 왼쪽으로 밀 수 있는가?
         // 맨 왼쪽 칸인 경우
         if(infos[num].c == 0) {
             return false;
@@ -319,15 +314,12 @@ public class Main {
 
         // 왼쪽 칸에 있는 다른 기사들을 이동시키지 못한 경우
         for(Integer i : another) {
-            if(!left(i)) {
+            if(!left(i, depth + 1)) {
                 return false;
             }
         }
 
-        // 이동
-        for(Integer i : another) {
-            moveLeft(i);
-        }
+        target.offer(new int[] {depth, num});
 
         return true;
     }
@@ -338,6 +330,5 @@ public class Main {
             position[infos[num].r + h][infos[num].c - 1] = num;
         }
         infos[num].c = infos[num].c - 1;
-        target.add(num);
     }
 }
